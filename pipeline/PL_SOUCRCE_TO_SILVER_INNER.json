@@ -114,7 +114,7 @@
 						"parameters": {
 							"container": "landing",
 							"folder": {
-								"value": "@concat(\n    activity('Read Table Details').output.firstRow.source_system,\n    '/',\n    activity('Read Table Details').output.firstRow.source_table_name,\n    '/',\n    variables('start_time')\n\n)",
+								"value": "@concat(\n    activity('Read Table Details').output.firstRow.source_system,\n    '/',\n    activity('Read Table Details').output.firstRow.source_table_name,\n    '/',\n    variables('start_time')\n)",
 								"type": "Expression"
 							}
 						}
@@ -182,7 +182,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/caresync-repo/caresync-adb-repo/landing_to_bronze",
+					"notebookPath": "/caresync-repo/caresync-adb-repo/bronze_to_silver",
 					"baseParameters": {
 						"source_system": {
 							"value": "@activity('Read Table Details').output.firstRow.source_system",
@@ -204,7 +204,7 @@
 				}
 			},
 			{
-				"name": "update failed status",
+				"name": "update success status",
 				"type": "Script",
 				"dependsOn": [
 					{
@@ -231,7 +231,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "update ctrl.audit_log\nSET STATUS='SUCCESS',end_time=SYSUTCDATETIME(),\nrecords_written=@{activity('Bronze to Silver').output.runOutput}\nwhere adf_run_id='@{pipeline().parameters.adf_run_id}' and table_id=@{pipeline().parameters.table_id}",
+								"value": "update ctrl.audit_log set status='SUCCESS', end_time=SYSUTCDATETIME(), records_written='@{coalesce(activity('Bronze to Silver').output.runOutput, '0')}' where adf_run_id='@{pipeline().parameters.adf_run_id}' and table_id=@{pipeline().parameters.table_id}",
 								"type": "Expression"
 							}
 						}
